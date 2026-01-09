@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "d7f3aefd-12a1-4d9f-ae5e-dac800310b11",
+		"name": "Bookly",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45694327"
+	},
+	"item": [
+		{
+			"name": "getAllBooks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/books",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"books"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addBook",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 7,\r\n    \"title\": \"Libro Pruebas\",\r\n    \"author\": \"Author Pruebas\",\r\n    \"publisher\": \"Publicador de pruebas\",\r\n    \"published_date\": \"2025-02-01\",\r\n    \"page_count\": 200,\r\n    \"language\": \"Espanol\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/books",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"books"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getBook",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/books/7",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"books",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patchBook",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Libro mas serio\",\r\n    \"author\": \"Author serio\",\r\n    \"publisher\": \"Publicador serio\",\r\n    \"page_count\": 200,\r\n    \"language\": \"Ingles\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/books/7",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"books",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteBook",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Libro mas serio\",\r\n    \"author\": \"Author serio\",\r\n    \"publisher\": \"Publicador serio\",\r\n    \"page_count\": 200,\r\n    \"language\": \"Ingles\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/books/7",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"books",
+						"7"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://127.0.0.1:8000/api/v1"
+		}
+	]
+}
