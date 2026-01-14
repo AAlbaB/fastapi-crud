@@ -15,3 +15,10 @@
 4. Instalar requirements: `python3 -m pip install -r requirements.txt`
 5. Crear el contenedor de Postgres: `docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest`
 6. Correr la aplicación con: `uvicorn src:app --reload`
+
+## Notas
+Alembic se usa para crear versiones de BD (revisar su uso especifico)
+- Para ejecutar Alembic: `alembic init -t async migrations` (Revisar su uso especifico, se deben realizar cambios en env.py y script)
+- Crear version de Alembic: `alembic revision --autogenerate -m "init"`
+- Para aplicar la ultima version de Alembic: `alembic upgrade head`
+- Ayuda de Alembic: `alembic -h`
