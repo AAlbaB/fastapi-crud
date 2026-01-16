@@ -1,17 +1,42 @@
-## Ejecutar aplicación en Windows (Local)
+## Ejecutar aplicación local
 
-1. Crear ambiente virtual en carpeta Backend: `python -m venv env`
-2. Activar ambiente virtual: `env/Scripts/activate`
+1. Crear ambiente virtual en carpeta Backend, Windows: `python -m venv env`, Ubuntu: `python3 -m venv env`
+
+2. Activar ambiente virtual, Windows: `env/Scripts/activate`, Ubuntu: `source env/bin/activate`
+
 3. En caso de tener problemas con activar el entorno virtual, se debe abrir el PowerShell como administrador y ejecutar el siguiente comando:  `Set-ExecutionPolicy RemoteSigned -Force`
-4. Validar en la consola que se tiene activo el ambiente virtual, para desactivar env: `deactivate`
-5. Instalar requirements: `pip install -r requirements.txt`
-6. Crear el contenedor de Postgres: `docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest`
-7. Correr la aplicación con: `uvicorn src:app --reload`
 
-## Ejecutar aplicación en Ubuntu (Local)
-1. Crear ambiente virtual en carpeta Backend: `python3 -m venv env`
-2. Activar ambiente virtual: `source env/bin/activate`
-3. Validar en la consola que se tiene activo el ambiente virtual, para desactivar env: `deactivate`
-4. Instalar requirements: `python3 -m pip install -r requirements.txt`
-5. Crear el contenedor de Postgres: `docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest`
-6. Correr la aplicación con: `uvicorn src:app --reload`
+4. Validar en la consola que se tiene activo el ambiente virtual, para desactivar env: `deactivate`
+
+5. Instalar requirements, Windows: `pip install -r requirements.txt`, Ubuntu: `python3 -m pip install -r requirements.txt`
+
+6. Crear el contenedor de Postgres:
+
+```docker
+docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest
+```
+
+7. Crear el contenedor para Redis (sin persistencia de datos/con persistencia):
+```docker
+docker run -d --name redis -p 6379:6379 redis:7
+```
+
+```docker
+docker run -d --name redis -p 6379:6379 -v redis_data:/data redis:7 redis-server --appendonly yes
+```
+
+8. Correr la aplicación con: `uvicorn src:app --reload`, si tiene FastAPI: `fastapi dev src/`
+
+
+## Notas
+Alembic se usa para crear versiones y realizar cambios en BD cuando se realicen:
+- Para ejecutar Alembic: `alembic init -t async migrations` 
+    > Se deben realizar cambios en env.py y script
+
+- Crear version de Alembic: `alembic revision --autogenerate -m "init"` 
+    > Se debe tener conexión en BD, lo que hace es como comparar lo que se tiene en BD y en lo que se tiene en código para crear que falta, "init" es el mensaje.
+
+- Para aplicar la ultima version de Alembic: `alembic upgrade head`
+    > Aplica los cambios de la última revision
+
+- Ayuda de Alembic: `alembic -h`
