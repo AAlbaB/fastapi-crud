@@ -1,0 +1,366 @@
+{
+	"info": {
+		"_postman_id": "e058f7e5-0564-49e9-94ce-0648861139f3",
+		"name": "Bookly",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32885636"
+	},
+	"item": [
+		{
+			"name": "books",
+			"item": [
+				{
+					"name": "getAllBooks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BooklyBaseURL}}/books",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addBook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Algorithms and Data Structures In Python\",\r\n    \"author\": \"Kent Lee\",\r\n    \"publisher\": \"Springer, Inc\",\r\n    \"published_date\": \"2021-01-01\",\r\n    \"page_count\": 9282,\r\n    \"language\": \"English\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BooklyBaseURL}}/books",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getBook",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BooklyBaseURL}}/books/{{BooklyIDBook}}",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"books",
+								"{{BooklyIDBook}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patchBook",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Libro mas serio\",\r\n    \"author\": \"Author serio\",\r\n    \"publisher\": \"Publicador serio\",\r\n    \"page_count\": 200,\r\n    \"language\": \"Ingles\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BooklyBaseURL}}/books/{{BooklyIDBook}}",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"books",
+								"{{BooklyIDBook}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteBook",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Libro mas serio\",\r\n    \"author\": \"Author serio\",\r\n    \"publisher\": \"Publicador serio\",\r\n    \"page_count\": 200,\r\n    \"language\": \"Ingles\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BooklyBaseURL}}/books/{{BooklyIDBook}}",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"books",
+								"{{BooklyIDBook}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{BooklyToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"John\",\r\n    \"last_name\": \"Doe\",\r\n    \"username\": \"JDoe123\",\r\n    \"email\": \"johndoe@mail.com\",\r\n    \"password\": \"passPrueba123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BooklyBaseURL}}/auth/signup",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extract tokens from response and set as collection variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Extract the access_token from the response",
+									"const accessToken = jsonData.access_token;",
+									"const refreshToken = jsonData.refresh_token;",
+									"",
+									"// Set the access_token and refresh_token as a collection variable",
+									"if (accessToken) {",
+									"    pm.collectionVariables.set(\"BooklyToken\", accessToken);",
+									"}",
+									"if (refreshToken){",
+									"    pm.collectionVariables.set(\"BooklyRefreshToken\", refreshToken);",
+									"}",
+									"",
+									"// Test to verify the token was successfully extracted and set",
+									"pm.test(\"Access token was successfully extracted and stored\", function() {",
+									"    pm.expect(accessToken).to.be.a('string');",
+									"    pm.expect(accessToken).to.not.be.empty;",
+									"    ",
+									"    const storedToken = pm.collectionVariables.get(\"BooklyToken\");",
+									"    pm.expect(storedToken).to.eql(accessToken);",
+									"});",
+									"",
+									"// Test to verify the refresh_token was successfully extracted and set",
+									"pm.test(\"Refres token was successfully extracted and stored\", function() {",
+									"    pm.expect(refreshToken).to.be.a('string');",
+									"    pm.expect(refreshToken).to.not.be.empty;",
+									"    ",
+									"    const storedToken = pm.collectionVariables.get(\"BooklyRefreshToken\");",
+									"    pm.expect(storedToken).to.eql(refreshToken);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"johndoe@mail.com\",\r\n    \"password\": \"passPrueba123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BooklyBaseURL}}/auth/login",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refreshToken",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{BooklyRefreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BooklyBaseURL}}/auth/refresh_token",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"auth",
+								"refresh_token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{BooklyToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BooklyBaseURL}}/auth/logout",
+							"host": [
+								"{{BooklyBaseURL}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BooklyBaseURL",
+			"value": "http://127.0.0.1:8000/api/v1"
+		},
+		{
+			"key": "BooklyIDBook",
+			"value": "4b97f108-edd5-443b-998f-d5259b20e5de"
+		},
+		{
+			"key": "BooklyToken",
+			"value": ""
+		},
+		{
+			"key": "BooklyRefreshToken",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
