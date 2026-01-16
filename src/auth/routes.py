@@ -1,21 +1,26 @@
+import logging
 from datetime import timedelta, datetime
 
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 
-from .dependencies import RefreshTokenBearer
+from .dependencies import RefreshTokenBearer, AccessTokenBearer
 from .schemas import UserCreateModel, UserModel, UserLoginModel
 from .service import UserService
 from .utils import create_access_token, verify_password
 
+
 from src.db.main import get_session
+from src.db.redis import add_jti_to_blocklist
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 auth_router = APIRouter()
 user_service = UserService()
 
 REFRESH_TOKEN_EXPIRY = 2
+
+logger = logging.getLogger(__name__)
 
 
 @auth_router.post(
@@ -85,4 +90,16 @@ async def get_new_access_token(token_details: dict = Depends(RefreshTokenBearer(
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token has expired"
+    )
+
+
+@auth_router.get("/logout")
+async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
+    blocked = await add_jti_to_blocklist(token_details["jti"])
+
+    if not blocked:
+        logger.warning("Logout without token block (Redis unavailable)")
+
+    return JSONResponse(
+        content={"message": "Logged Out Successfully"}, status_code=status.HTTP_200_OK
     )

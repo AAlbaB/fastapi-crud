@@ -4,7 +4,6 @@ import logging
 
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from itsdangerous import URLSafeTimedSerializer
 
 from src.config import config
 

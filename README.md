@@ -16,7 +16,16 @@
 docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest
 ```
 
-7. Correr la aplicación con: `uvicorn src:app --reload`, si tiene FastAPI: `fastapi dev src/`
+7. Crear el contenedor para Redis (sin persistencia de datos/con persistencia):
+```docker
+docker run -d --name redis -p 6379:6379 redis:7
+```
+
+```docker
+docker run -d --name redis -p 6379:6379 -v redis_data:/data redis:7 redis-server --appendonly yes
+```
+
+8. Correr la aplicación con: `uvicorn src:app --reload`, si tiene FastAPI: `fastapi dev src/`
 
 
 ## Notas
