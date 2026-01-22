@@ -10,7 +10,7 @@
 
 5. Instalar requirements, Windows: `pip install -r requirements.txt`, Ubuntu: `python3 -m pip install -r requirements.txt`
 
-6. Crear el contenedor de Postgres:
+6. Crear el contenedor de Postgres (Despúes usar alembic para crear las tablas en BD):
 
 ```docker
 docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest
