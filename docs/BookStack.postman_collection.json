@@ -1,0 +1,753 @@
+{
+  "info": {
+    "_postman_id": "cfac4223-3b65-4068-8fcc-f754b5212bca",
+    "name": "BookStack",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45694327"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"first_name\": \"John\",\r\n    \"last_name\": \"Doe\",\r\n    \"username\": \"JDoe123\",\r\n    \"email\": \"johndoe@mail.com\",\r\n    \"password\": \"passPrueba123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/signup",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Extract tokens from response and set as collection variable",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// Extract the access_token from the response",
+                  "const accessToken = jsonData.access_token;",
+                  "const refreshToken = jsonData.refresh_token;",
+                  "",
+                  "// Set the access_token and refresh_token as a collection variable",
+                  "if (accessToken) {",
+                  "    pm.collectionVariables.set(\"BookStackToken\", accessToken);",
+                  "}",
+                  "if (refreshToken){",
+                  "    pm.collectionVariables.set(\"BookStackRefreshToken\", refreshToken);",
+                  "}",
+                  "",
+                  "// Test to verify the token was successfully extracted and set",
+                  "pm.test(\"Access token was successfully extracted and stored\", function() {",
+                  "    pm.expect(accessToken).to.be.a('string');",
+                  "    pm.expect(accessToken).to.not.be.empty;",
+                  "    ",
+                  "    const storedToken = pm.collectionVariables.get(\"BookStackToken\");",
+                  "    pm.expect(storedToken).to.eql(accessToken);",
+                  "});",
+                  "",
+                  "// Test to verify the refresh_token was successfully extracted and set",
+                  "pm.test(\"Refres token was successfully extracted and stored\", function() {",
+                  "    pm.expect(refreshToken).to.be.a('string');",
+                  "    pm.expect(refreshToken).to.not.be.empty;",
+                  "    ",
+                  "    const storedToken = pm.collectionVariables.get(\"BookStackRefreshToken\");",
+                  "    pm.expect(storedToken).to.eql(refreshToken);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"johndoe@mail.com\",\r\n    \"password\": \"passPrueba123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/login",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refreshToken",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{BookStackRefreshToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/refresh_token",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "refresh_token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{BookStackToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/logout",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get current user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{BookStackToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/me",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "book",
+      "item": [
+        {
+          "name": "getAllBooks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BookStackBaseURL}}/books",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addBook",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Algorithms and Data Structures In Python\",\r\n    \"author\": \"Kent Lee\",\r\n    \"publisher\": \"Springer, Inc\",\r\n    \"published_date\": \"2021-01-01\",\r\n    \"page_count\": 9282,\r\n    \"language\": \"English\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/books",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getBook",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BookStackBaseURL}}/books/{{BookStackBookID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "books",
+                "{{BookStackBookID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "patchBook",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Libro mas serio\",\r\n    \"author\": \"Author serio\",\r\n    \"publisher\": \"Publicador serio\",\r\n    \"page_count\": 200,\r\n    \"language\": \"Ingles\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/books/{{BookStackBookID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "books",
+                "{{BookStackBookID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteBook",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/books/{{BookStackBookID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "books",
+                "{{BookStackBookID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getBooks by user id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BookStackBaseURL}}/books/user/{{BookStackUserID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "books",
+                "user",
+                "{{BookStackUserID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{BookStackToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "item": [
+        {
+          "name": "addReview",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"rating\": 1,\r\n    \"review_text\": \"I dont like this book\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/reviews/book/{{BookStackBookID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "reviews",
+                "book",
+                "{{BookStackBookID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getReview",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/reviews/{{BookStackReviewID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "reviews",
+                "{{BookStackReviewID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllReviews",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/reviews",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteReview",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/reviews/{{BookStackReviewID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "reviews",
+                "{{BookStackReviewID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{BookStackToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "tags",
+      "item": [
+        {
+          "name": "getAllTags",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/tags",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addTag",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Programming\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/tags",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addTag to a book",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"tags\": [\r\n        {\r\n            \"name\": \"Programming\"\r\n        },\r\n        {\r\n            \"name\": \"Python\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/tags/book/{{BookStackBookID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "tags",
+                "book",
+                "{{BookStackBookID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "putTag",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Linux\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/tags/{{BookStackTagID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "tags",
+                "{{BookStackTagID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteTag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/tags/{{BookStackTagID}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "tags",
+                "{{BookStackTagID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{BookStackToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BookStackBaseURL",
+      "value": "http://127.0.0.1:8000/api/v1"
+    },
+    {
+      "key": "BookStackToken",
+      "value": ""
+    },
+    {
+      "key": "BookStackRefreshToken",
+      "value": ""
+    },
+    {
+      "key": "BookStackBookID",
+      "value": ""
+    },
+    {
+      "key": "BookStackUserID",
+      "value": ""
+    },
+    {
+      "key": "BookStackReviewID",
+      "value": ""
+    },
+    {
+      "key": "BookStackTagID",
+      "value": ""
+    }
+  ]
+}

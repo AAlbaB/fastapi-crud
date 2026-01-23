@@ -1,10 +1,10 @@
 from fastapi import status
-from fastapi.exceptions import HTTPException
 from sqlmodel import desc, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.books.service import BookService
 from src.db.models import Tag
+from src.errors import BookNotFound, TagNotFound, TagAlreadyExists
 
 from .schemas import TagAddModel, TagCreateModel
 
@@ -25,9 +25,7 @@ class TagService:
         book = await book_service.get_book(book_uid=book_uid, session=session)
 
         if not book:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"
-            )
+            raise BookNotFound()
 
         for tag_item in tag_data.tags:
             result = await session.exec(select(Tag).where(Tag.name == tag_item.name))
@@ -61,9 +59,8 @@ class TagService:
         tag = await self.get_tag_by_name(normalized, session)
 
         if tag:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Tag already exists"
-            )
+            raise TagAlreadyExists()
+
         new_tag = Tag(name=tag_data.name)
 
         session.add(new_tag)
@@ -78,16 +75,12 @@ class TagService:
         tag_exist = await self.get_tag_by_name(normalized, session)
 
         if tag_exist:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Tag already exists"
-            )
+            raise TagAlreadyExists()
 
         tag = await self.get_tag_by_uid(tag_uid, session)
 
         if not tag:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-            )
+            raise TagNotFound()
 
         tag.name = normalized
         await session.commit()
@@ -100,9 +93,7 @@ class TagService:
         tag = await self.get_tag_by_uid(tag_uid, session)
 
         if not tag:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-            )
+            raise TagNotFound()
 
         await session.delete(tag)
         await session.commit()
