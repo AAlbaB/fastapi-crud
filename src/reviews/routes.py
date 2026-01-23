@@ -1,11 +1,11 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlmodel.ext.asyncio.session import AsyncSession
-from fastapi.exceptions import HTTPException
 
 from src.auth.dependencies import RoleChecker, get_current_user
 from src.db.main import get_session
 from src.db.models import User
+from src.errors import ReviewNotFound
 
 from .schemas import ReviewModel, ReviewCreateModel
 from .service import ReviewService
@@ -36,9 +36,8 @@ async def get_review(
     review = await review_service.get_review(review_uid, session)
 
     if not review:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Review not found"
-        )
+        raise ReviewNotFound()
+
     return review
 
 
@@ -48,7 +47,7 @@ async def get_review(
     dependencies=[user_role_checker],
 )
 async def add_review_to_books(
-    book_uid: str,
+    book_uid: UUID,
     review_data: ReviewCreateModel,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),

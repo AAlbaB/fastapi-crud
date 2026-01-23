@@ -1,42 +1,146 @@
-## Ejecutar aplicación local
+# BookStack API
 
-1. Crear ambiente virtual en carpeta Backend, Windows: `python -m venv env`, Ubuntu: `python3 -m venv env`
+BookStack is a FastAPI-based application for managing books, reviews, and tags with full CRUD operations. It features JWT authentication, role-based access control, and asynchronous database operations using SQLModel and PostgreSQL.
 
-2. Activar ambiente virtual, Windows: `env/Scripts/activate`, Ubuntu: `source env/bin/activate`
+## Features
 
-3. En caso de tener problemas con activar el entorno virtual, se debe abrir el PowerShell como administrador y ejecutar el siguiente comando:  `Set-ExecutionPolicy RemoteSigned -Force`
+- **Book Management:** Create, read, update, and delete books
+- **User Authentication:** JWT-based authentication with access and refresh tokens
+- **Role-Based Access Control (RBAC):** Admin and user roles with permission checking
+- **Reviews System:** Users can add and manage reviews for books with ratings
+- **Tags System:** Organize books with tags and manage tag associations
+- **Redis Integration:** Token blocklist management for logout functionality
+- **Async Operations:** Built with async/await for high performance
+- **Database Migrations:** Alembic for version control of database schema
 
-4. Validar en la consola que se tiene activo el ambiente virtual, para desactivar env: `deactivate`
+## Technology Stack
 
-5. Instalar requirements, Windows: `pip install -r requirements.txt`, Ubuntu: `python3 -m pip install -r requirements.txt`
+- **Python 3.12**
+- **FastAPI** – high-performance async web framework
+- **SQLModel / SQLAlchemy (Async)** – ORM and database layer
+- **PostgreSQL** – relational database
+- **Redis** – token blocklist and session-related operations
+- **Alembic** – database migrations
+- **Docker** – service containerization
+- **JWT** – secure authentication mechanism
 
-6. Crear el contenedor de Postgres (Despúes usar alembic para crear las tablas en BD):
+## Project Structure
 
-```docker
-docker run -d --name postgres-container -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin1234 -e POSTGRES_DB=bookly_db -p 5432:5432 -v postgres-volume:/var/lib/postgresql postgres:latest
+```
+├── src/
+│   ├── auth/                    # Authentication and user management
+│   ├── books/                   # Book CRUD and related logic
+│   ├── db/                      # Database models and session management
+│   ├── reviews/                 # Review CRUD and related logic
+│   ├── tags/                    # Tag CRUD and related logic
+│   ├── __init__.py              # FastAPI app initialization
+│   ├── config.py                # App configuration (env vars)
+│   ├── errors.py                # Custom error classes and handlers
+├── docs/                        # Documentation and Postman collection
+├── migrations/                  # Alembic migration scripts
+├── .gitignore                   # Git ignore file
+├── .env                         # Environment variables
+├── alembic.ini                  # Alembic config for migrations
+└── requirements.txt             # Python dependencies
 ```
 
-7. Crear el contenedor para Redis (sin persistencia de datos/con persistencia):
-```docker
-docker run -d --name redis -p 6379:6379 redis:7
+## Getting Started
+
+### 1. Clone the repository
+
+```sh
+git clone https://github.com/AAlbaB/fastapi-crud.git
+cd fastapi-crud
 ```
 
-```docker
-docker run -d --name redis -p 6379:6379 -v redis_data:/data redis:7 redis-server --appendonly yes
+### 2. Create and activate a virtual environment
+
+**Linux/macOS:**
+```sh
+python3 -m venv env
+source env/bin/activate
 ```
 
-8. Correr la aplicación con: `uvicorn src:app --reload`, si tiene FastAPI: `fastapi dev src/`
+**Windows:**
+```sh
+python -m venv env
+env\Scripts\activate
+```
 
+### 3. Install dependencies
 
-## Notas
-Alembic se usa para crear versiones y realizar cambios en BD cuando se realicen:
-- Para ejecutar Alembic: `alembic init -t async migrations` 
-    > Se deben realizar cambios en env.py y script
+**Linux/macOS:**
+```sh
+python3 -m pip install -r requirements.txt
+```
 
-- Crear version de Alembic: `alembic revision --autogenerate -m "init"` 
-    > Se debe tener conexión en BD, lo que hace es como comparar lo que se tiene en BD y en lo que se tiene en código para crear que falta, "init" es el mensaje.
+**Windows:**
+```sh
+pip install -r requirements.txt
+```
 
-- Para aplicar la ultima version de Alembic: `alembic upgrade head`
-    > Aplica los cambios de la última revision
+### 4. Configure environment variables
 
-- Ayuda de Alembic: `alembic -h`
+Create a `.env` file in the root directory:
+
+```
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/bookstack_db
+JWT_SECRET=your-secret-key
+JWT_ALGORITHM=HS256
+REDIS_URL=redis://localhost:6379
+```
+
+### 5. Start PostgreSQL and Redis with docker
+
+**PostgreSQL:**
+```sh
+docker run -d \
+  --name postgres-container \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=admin1234 \
+  -e POSTGRES_DB=bookstack_db \
+  -p 5432:5432 \
+  -v postgres-volume:/var/lib/postgresql \
+  postgres:latest
+```
+
+**Redis:**
+```sh
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  redis:7
+```
+
+### 6. Run database migrations
+
+```sh
+alembic upgrade head
+```
+
+### 7. Start the FastAPI application
+
+```sh
+uvicorn src:app --reload
+```
+
+The API will be available at [http://127.0.0.1:8000/api/v1](http://127.0.0.1:8000/api/v1)
+
+## API Documentation
+
+- Interactive docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- Postman collection: [`docs/BookStack.postman_collection.json`](docs/BookStack.postman_collection.json)
+
+## Usage
+
+- Register a user via `/api/v1/auth/signup`
+- Login to receive JWT tokens via `/api/v1/auth/login`
+- Use the access token for authenticated requests (books, reviews, tags)
+- Use the refresh token to obtain new access tokens
+- Only users with the `admin` role can access certain endpoints
+
+## Development Notes
+
+- Alembic is used for all database migrations.
+- Use the `RoleChecker` dependency for role-based access.
+- The project uses async SQLModel sessions for all DB operations.

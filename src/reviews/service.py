@@ -8,6 +8,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.auth.service import UserService
 from src.books.service import BookService
 from src.db.models import Review
+from src.errors import BookNotFound, UserNotFound
 
 from .schemas import ReviewCreateModel
 
@@ -30,14 +31,10 @@ class ReviewService:
             )
 
             if not book:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"
-                )
+                raise BookNotFound()
 
             if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-                )
+                raise UserNotFound()
 
             review_data_dict = review_data.model_dump()
             new_review = Review(**review_data_dict, user=user, book=book)

@@ -1,8 +1,8 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 from sqlmodel.ext.asyncio.session import AsyncSession
-
 
 from src.auth.dependencies import RoleChecker
 from src.books.schemas import Book
@@ -42,7 +42,7 @@ async def add_tag(
     "/book/{book_uid}", response_model=Book, dependencies=[user_role_checker]
 )
 async def add_tags_to_book(
-    book_uid: str, tag_data: TagAddModel, session: AsyncSession = Depends(get_session)
+    book_uid: UUID, tag_data: TagAddModel, session: AsyncSession = Depends(get_session)
 ) -> Book:
 
     book_with_tag = await tag_service.add_tags_to_book(
@@ -56,7 +56,7 @@ async def add_tags_to_book(
     "/{tag_uid}", response_model=TagModel, dependencies=[user_role_checker]
 )
 async def update_tag(
-    tag_uid: str,
+    tag_uid: UUID,
     tag_update_data: TagCreateModel,
     session: AsyncSession = Depends(get_session),
 ) -> TagModel:
@@ -71,7 +71,7 @@ async def update_tag(
     dependencies=[user_role_checker],
 )
 async def delete_tag(
-    tag_uid: str, session: AsyncSession = Depends(get_session)
+    tag_uid: UUID, session: AsyncSession = Depends(get_session)
 ) -> None:
     updated_tag = await tag_service.delete_tag(tag_uid, session)
 
