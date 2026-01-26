@@ -6,6 +6,7 @@ from src.reviews.routes import review_router
 from src.tags.routes import tags_router
 
 from .errors import register_all_errors
+from .middleware import register_middleware
 
 version = "v1"
 version_prefix = f"/api/{version}"
@@ -17,6 +18,7 @@ app = FastAPI(
 )
 
 register_all_errors(app)
+register_middleware(app)
 
 app.include_router(book_router, prefix=f"{version_prefix}/books", tags=["books"])
 app.include_router(auth_router, prefix=f"{version_prefix}/auth", tags=["auth"])
