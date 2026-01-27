@@ -7,6 +7,7 @@ BookStack is a FastAPI-based application for managing books, reviews, and tags w
 - **Book Management:** Create, read, update, and delete books
 - **User Authentication:** JWT-based authentication with access and refresh tokens
 - **Role-Based Access Control (RBAC):** Admin and user roles with permission checking
+- **Email Verification:** Verify user account using the token sent to their email 
 - **Reviews System:** Users can add and manage reviews for books with ratings
 - **Tags System:** Organize books with tags and manage tag associations
 - **Redis Integration:** Token blocklist management for logout functionality
@@ -90,6 +91,20 @@ JWT_ALGORITHM=HS256
 REDIS_URL=redis://localhost:6379
 ```
 
+The application uses **Async SMTP** for sending verification emails. Configure these environment variables:
+
+```
+MAIL_FROM=noreply@bookstack.com
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+DOMAIN=localhost:8000
+```
+
+**Important:** For Gmail, use an [App Password](https://myaccount.google.com/apppasswords) instead of your regular password.
+
+
 ### 5. Start PostgreSQL and Redis with docker
 
 **PostgreSQL:**
@@ -131,16 +146,32 @@ The API will be available at [http://127.0.0.1:8000/api/v1](http://127.0.0.1:800
 - Interactive docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - Postman collection: [`docs/BookStack.postman_collection.json`](docs/BookStack.postman_collection.json)
 
-## Usage
+## Authentication Flow
 
-- Register a user via `/api/v1/auth/signup`
-- Login to receive JWT tokens via `/api/v1/auth/login`
-- Use the access token for authenticated requests (books, reviews, tags)
-- Use the refresh token to obtain new access tokens
-- Only users with the `admin` role can access certain endpoints
+```
+1. User signs up with email/password: 
+   ↓
+2. Verification email sent with secure token
+   ↓
+3. User clicks verification link
+   ↓
+4. Account marked as verified
+   ↓
+5. User logs in with credentials
+   ↓
+6. Receives access_token (short-lived) & refresh_token (long-lived)
+   ↓
+7. Use access_token for API requests
+   ↓
+8. When access_token expires, use refresh_token to get new one
+   ↓
+9. On logout, token is added to Redis blocklist
+```
 
 ## Development Notes
 
 - Alembic is used for all database migrations.
 - Use the `RoleChecker` dependency for role-based access.
 - The project uses async SQLModel sessions for all DB operations.
+- JWT tokens are validated on each request and checked against Redis blocklist for revoked tokens.
+- Email verification tokens are URL-safe and expire after a configured duration.
