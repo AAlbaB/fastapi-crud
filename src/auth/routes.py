@@ -1,5 +1,7 @@
+import os
 import logging
 from datetime import timedelta, datetime
+from jinja2 import Template
 
 from sqlmodel.ext.asyncio.session import AsyncSession
 from fastapi import APIRouter, Depends, status
@@ -53,10 +55,14 @@ async def create_user_account(
     token = create_url_safe_token({"email": email})
     link = f"http://{config.DOMAIN}/api/v1/auth/verify/{token}"
 
-    html = f"""
-    <h1>Verify your Email</h1>
-    <p>Please click this <a href="{link}">link</a> to verify your email</p>
-    """
+    # Load the HTML template
+    template_path = os.path.join(
+        os.path.dirname(__file__), "../templates/verify_email.html"
+    )
+    with open(template_path, "r") as template_file:
+        html_template = Template(template_file.read())
+
+    html = html_template.render(verification_link=link)
     message = create_message([email], "Verify Your email", html)
 
     await mail.send_message(message)
