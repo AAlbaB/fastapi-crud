@@ -6,6 +6,7 @@ from jinja2 import Template
 from sqlmodel.ext.asyncio.session import AsyncSession
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 
 from .dependencies import (
     RefreshTokenBearer,
@@ -17,10 +18,13 @@ from .schemas import (
     UserCreateModel,
     UserLoginModel,
     UserBooksModel,
+    PasswordResetRequestModel,
+    PasswordResetConfirmModel,
 )
 from .service import UserService
 from .utils import (
     create_access_token,
+    generate_passwd_hash,
     verify_password,
     create_url_safe_token,
     decode_url_safe_token,
@@ -55,7 +59,6 @@ async def create_user_account(
     token = create_url_safe_token({"email": email})
     link = f"http://{config.DOMAIN}/api/v1/auth/verify/{token}"
 
-    # Load the HTML template
     template_path = os.path.join(
         os.path.dirname(__file__), "../templates/verify_email.html"
     )
@@ -166,4 +169,66 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
 
     return JSONResponse(
         content={"message": "Logged Out Successfully"}, status_code=status.HTTP_200_OK
+    )
+
+
+@auth_router.post("/password-reset-request")
+async def password_reset_request(email_data: PasswordResetRequestModel):
+    email = email_data.email
+
+    token = create_url_safe_token({"email": email})
+
+    link = f"http://{config.DOMAIN}/api/v1/auth/password-reset-confirm/{token}"
+
+    html_message = f"""
+    <h1>Reset Your Password</h1>
+    <p>Please click this <a href="{link}">link</a> to Reset Your Password</p>
+    """
+    subject = "Reset Your Password"
+
+    message = create_message([email], subject, html_message)
+    await mail.send_message(message)
+
+    return JSONResponse(
+        content={
+            "message": "Please check your email for instructions to reset your password",
+        },
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@auth_router.post("/password-reset-confirm/{token}")
+async def reset_account_password(
+    token: str,
+    passwords: PasswordResetConfirmModel,
+    session: AsyncSession = Depends(get_session),
+):
+    new_password = passwords.new_password
+    confirm_password = passwords.confirm_new_password
+
+    if new_password != confirm_password:
+        raise HTTPException(
+            detail="Passwords do not match", status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    token_data = decode_url_safe_token(token)
+    user_email = token_data.get("email")
+
+    if user_email:
+        user = await user_service.get_user_by_email(user_email, session)
+
+        if not user:
+            raise UserNotFound()
+
+        passwd_hash = generate_passwd_hash(new_password)
+        await user_service.update_user(user, {"password_hash": passwd_hash}, session)
+
+        return JSONResponse(
+            content={"message": "Password reset Successfully"},
+            status_code=status.HTTP_200_OK,
+        )
+
+    return JSONResponse(
+        content={"message": "Error occured during password reset."},
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )
