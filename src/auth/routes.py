@@ -172,21 +172,22 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
     )
 
 
-@auth_router.post("/password-reset-request")
+@auth_router.post("/password_reset")
 async def password_reset_request(email_data: PasswordResetRequestModel):
     email = email_data.email
 
     token = create_url_safe_token({"email": email})
+    link = f"http://{config.DOMAIN}/api/v1/auth/password_reset_confirm/{token}"
 
-    link = f"http://{config.DOMAIN}/api/v1/auth/password-reset-confirm/{token}"
+    template_path = os.path.join(
+        os.path.dirname(__file__), "../templates/password_reset.html"
+    )
+    with open(template_path, "r") as template_file:
+        html_template = Template(template_file.read())
 
-    html_message = f"""
-    <h1>Reset Your Password</h1>
-    <p>Please click this <a href="{link}">link</a> to Reset Your Password</p>
-    """
-    subject = "Reset Your Password"
+    html = html_template.render(reset_link=link)
+    message = create_message([email], "Reset Your Password", html)
 
-    message = create_message([email], subject, html_message)
     await mail.send_message(message)
 
     return JSONResponse(
@@ -197,7 +198,7 @@ async def password_reset_request(email_data: PasswordResetRequestModel):
     )
 
 
-@auth_router.post("/password-reset-confirm/{token}")
+@auth_router.post("/password_reset_confirm/{token}")
 async def reset_account_password(
     token: str,
     passwords: PasswordResetConfirmModel,

@@ -94,11 +94,12 @@ REDIS_URL=redis://localhost:6379
 The application uses **Async SMTP** for sending verification emails. Configure these environment variables:
 
 ```
-MAIL_FROM=noreply@bookstack.com
 MAIL_USERNAME=your-email@gmail.com
 MAIL_PASSWORD=your-app-password
 MAIL_SERVER=smtp.gmail.com
 MAIL_PORT=587
+MAIL_FROM=your-email@gmail.com
+MAIL_FROM_NAME=BookStack
 DOMAIN=localhost:8000
 ```
 
