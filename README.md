@@ -140,6 +140,18 @@ alembic upgrade head
 uvicorn src:app --reload
 ```
 
+**Start Celery (In other terminal)**
+```sh
+celery -A src.celery_tasks.c_app worker
+```
+
+**Start Flower (In other terminal)**
+```sh
+celery -A src.celery_tasks.c_app flower
+```
+
+You can see the Flower interface in: [http://127.0.0.1:5555](http://127.0.0.1:5555)
+
 The API will be available at [http://127.0.0.1:8000/api/v1](http://127.0.0.1:8000/api/v1)
 
 ## API Documentation

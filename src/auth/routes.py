@@ -31,7 +31,7 @@ from .utils import (
 )
 
 from src.config import config
-from src.mail import mail, create_message
+from src.celery_tasks import send_email
 from src.db.main import get_session
 from src.db.redis import add_jti_to_blocklist
 from src.errors import UserAlreadyExists, InvalidCredentials, InvalidToken, UserNotFound
@@ -66,9 +66,8 @@ async def create_user_account(
         html_template = Template(template_file.read())
 
     html = html_template.render(verification_link=link)
-    message = create_message([email], "Verify Your email", html)
 
-    await mail.send_message(message)
+    send_email.delay([email], "Verify Your email", html)
 
     return {
         "message": "Account Created! Check email to verify your account",
@@ -186,9 +185,8 @@ async def password_reset_request(email_data: PasswordResetRequestModel):
         html_template = Template(template_file.read())
 
     html = html_template.render(reset_link=link)
-    message = create_message([email], "Reset Your Password", html)
 
-    await mail.send_message(message)
+    send_email.delay([email], "Verify Your email", html)
 
     return JSONResponse(
         content={
