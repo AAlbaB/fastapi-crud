@@ -17,6 +17,7 @@ from src.errors import (
     AccessTokenRequired,
     RefreshTokenRequired,
     InsufficientPermission,
+    AccountNotVerified,
 )
 
 user_service = UserService()
@@ -49,7 +50,8 @@ class TokenBearer(HTTPBearer):
         return token_data is not None
 
     def verify_token_data(self, token_data):
-        raise NotImplementedError("Please Override this method in child classes")
+        raise NotImplementedError(
+            "Please Override this method in child classes")
 
 
 class AccessTokenBearer(TokenBearer):
@@ -80,6 +82,9 @@ class RoleChecker:
         self.allowed_roles = allowed_roles
 
     def __call__(self, current_user: User = Depends(get_current_user)) -> Any:
+        if not current_user.is_verified:
+            raise AccountNotVerified()
+
         if current_user.role in self.allowed_roles:
             return True
 

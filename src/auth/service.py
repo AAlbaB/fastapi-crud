@@ -6,6 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.db.models import User
 
+
 class UserService:
     async def get_user_by_email(self, email: str, session: AsyncSession):
         statement = select(User).where(User.email == email)
@@ -28,3 +29,12 @@ class UserService:
         await session.commit()
 
         return new_user
+
+    async def update_user(self, user: User, user_data: dict, session: AsyncSession):
+
+        for k, v in user_data.items():
+            setattr(user, k, v)
+
+        await session.commit()
+
+        return user

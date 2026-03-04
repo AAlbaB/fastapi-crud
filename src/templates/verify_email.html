@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333333;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .content {
+            color: #555555;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .verify-button {
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff !important;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 30px 0;
+        }
+
+        .link-text {
+            word-break: break-all;
+            color: #28a745;
+            font-size: 12px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+            margin-top: 40px;
+            border-top: 1px solid #eeeeee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Verify Your Email</h1>
+        </div>
+
+        <div class="content">
+            <p>
+                Thank you for creating an account with <strong>BookStack</strong>.
+                To complete your registration, please verify your email address.
+            </p>
+
+            <div style="text-align: center;">
+                <a href="{{verification_link}}" class="verify-button">
+                    Verify Email
+                </a>
+            </div>
+
+            <p>
+                Or copy and paste this link into your browser:
+            </p>
+
+            <p class="link-text">
+                {{verification_link}}
+            </p>
+
+            <p>
+                This verification link will expire in <strong>24 hours</strong>.
+            </p>
+
+            <p>
+                If you did not create this account, you can safely ignore this email.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 <strong>BookStack</strong>. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

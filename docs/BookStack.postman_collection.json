@@ -108,6 +108,77 @@
           "response": []
         },
         {
+          "name": "password reset",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"andresalbab13@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/password_reset",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "password_reset"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "change password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"new_password\": \"NewPass12345\",\r\n    \"confirm_new_password\": \"NewPass12345\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BookStackBaseURL}}/auth/password_reset_confirm/{{BookStackTokenPass}}",
+              "host": [
+                "{{BookStackBaseURL}}"
+              ],
+              "path": [
+                "auth",
+                "password_reset_confirm",
+                "{{BookStackTokenPass}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "refreshToken",
           "request": {
             "auth": {
@@ -731,6 +802,10 @@
     },
     {
       "key": "BookStackRefreshToken",
+      "value": ""
+    },
+    {
+      "key": "BookStackTokenPass",
       "value": ""
     },
     {
