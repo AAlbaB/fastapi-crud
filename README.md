@@ -21,6 +21,7 @@ BookStack is a FastAPI-based application for managing books, reviews, and tags w
 - **SQLModel / SQLAlchemy (Async)** – ORM and database layer
 - **PostgreSQL** – relational database
 - **Redis** – token blocklist and session-related operations
+- **Celery** - asynchronous task queuing and distributed computing
 - **Alembic** – database migrations
 - **Docker** – service containerization
 - **JWT** – secure authentication mechanism
@@ -42,10 +43,12 @@ BookStack is a FastAPI-based application for managing books, reviews, and tags w
 ├── .gitignore                   # Git ignore file
 ├── .env                         # Environment variables
 ├── alembic.ini                  # Alembic config for migrations
+├── compose.yml                  # Compose file 
+├── Dockerfile                   # Docker file 
 └── requirements.txt             # Python dependencies
 ```
 
-## Getting Started
+## Getting Started with Docker
 
 ### 1. Clone the repository
 
@@ -54,41 +57,18 @@ git clone https://github.com/AAlbaB/fastapi-crud.git
 cd fastapi-crud
 ```
 
-### 2. Create and activate a virtual environment
-
-**Linux/macOS:**
-```sh
-python3 -m venv env
-source env/bin/activate
-```
-
-**Windows:**
-```sh
-python -m venv env
-env\Scripts\activate
-```
-
-### 3. Install dependencies
-
-**Linux/macOS:**
-```sh
-python3 -m pip install -r requirements.txt
-```
-
-**Windows:**
-```sh
-pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
+### 2. Configure environment variables
 
 Create a `.env` file in the root directory:
 
 ```
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/bookstack_db
+DATABASE_URL=postgresql+asyncpg://user:password@db:5432/bookstack_db
 JWT_SECRET=your-secret-key
 JWT_ALGORITHM=HS256
-REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://redis:6379
+POSTGRES_USER=your-user-db
+POSTGRES_PASSWORD=your-pass-db
+POSTGRES_DB=bookstack_db
 ```
 
 The application uses **Async SMTP** for sending verification emails. Configure these environment variables:
@@ -105,49 +85,19 @@ DOMAIN=localhost:8000
 
 **Important:** For Gmail, use an [App Password](https://myaccount.google.com/apppasswords) instead of your regular password.
 
-
-### 5. Start PostgreSQL and Redis with docker
-
-**PostgreSQL:**
+### 2. Run containers
 ```sh
-docker run -d \
-  --name postgres-container \
-  -e POSTGRES_USER=admin \
-  -e POSTGRES_PASSWORD=admin1234 \
-  -e POSTGRES_DB=bookstack_db \
-  -p 5432:5432 \
-  -v postgres-volume:/var/lib/postgresql \
-  postgres:latest
+docker-compose up -d
 ```
 
-**Redis:**
+### 3. Create tables (Just once)
 ```sh
-docker run -d \
-  --name redis \
-  -p 6379:6379 \
-  redis:7
+docker-compose exec web alembic upgrade head
 ```
 
-### 6. Run database migrations
-
+### 4. Stop and remove containers
 ```sh
-alembic upgrade head
-```
-
-### 7. Start the FastAPI application
-
-```sh
-uvicorn src:app --reload
-```
-
-**Start Celery (In other terminal)**
-```sh
-celery -A src.celery_tasks.c_app worker
-```
-
-**Start Flower (In other terminal)**
-```sh
-celery -A src.celery_tasks.c_app flower
+docker-compose down    
 ```
 
 You can see the Flower interface in: [http://127.0.0.1:5555](http://127.0.0.1:5555)
